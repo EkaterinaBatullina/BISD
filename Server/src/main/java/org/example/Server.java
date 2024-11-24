@@ -16,11 +16,11 @@ public class Server {
     private static volatile boolean isRunning = true;
 
     public static void main(String[] args) {
-        //TODO: Проверить поентжжжжжа, код 127.0.0.1, порт 5009
+        //TODO:Провььерить поентжжжжжа, кодлл 127.0.0.1, порт 5009
         try (ServerSocket serverSocket = new ServerSocket(SERVER_PORT)) {
-            //TODO: Проверитнтжжжжжжжжжжжа, код 127.0ддд.0.1, порт 5009
+            //TODO: Проверит код 127.0ддд.0.1, порт 5009
             System.out.println("Сервер запущен на порту " + SERVER_PORT);
-            //TODO: Проверитьхххжжж поентжжжжжа, код 127.0ддд.0.1, порт 5009
+            //TODO: Прове поентжжжжжа, код 127.вв0ддд.0.1, порт 5009
             Map<String, IResourceHandler> resources = new HashMap<>();
             resources.put("/home", new HomeResourceHandler());
 
