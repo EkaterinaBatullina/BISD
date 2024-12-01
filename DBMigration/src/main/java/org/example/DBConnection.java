@@ -11,16 +11,18 @@ public class DBConnection {
 
         private static Connection connection;
 
-//        private static HikariDataSource dataSource;
+        //private static HikariDataSource dataSource;
 
         private DBConnection() {}
 
         public static Connection getConnection() throws SQLException {
             if (connection == null || connection.isClosed()) {
-                try {
-                    connection = DriverManager.getConnection(
-                            "jdbc:postgresql://localhost:5432/lab06", "postgres", "password");
-                } catch (SQLException e) {
+                synchronized (DBConnection.class) {
+                    if (connection == null || connection.isClosed()) {
+                        try {
+                            connection = DriverManager.getConnection(
+                                "jdbc:postgresql://localhost:5432/lab06", "postgres", "password");
+                        } catch (SQLException e) {
                     throw new SQLException("Ошибка подключения", e);
                 }
             }
