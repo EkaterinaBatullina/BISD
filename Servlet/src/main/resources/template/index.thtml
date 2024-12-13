@@ -10,7 +10,7 @@
 <h2>${param2}</h2>
 
 <div>
-    <!-- отправляем запрос на урл логин-->
+
     <form method="post" action="/Servlet/login">
         <div>
             Name: <input type="text" name="name">
