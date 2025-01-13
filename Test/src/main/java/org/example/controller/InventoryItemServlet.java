@@ -31,11 +31,18 @@ public class InventoryItemServlet extends HttpServlet {
         InventoryItemService service = new InventoryItemService();
         try {
             List<InventoryItem> items = service.findAll();
-            Map<String, Object> data = Map.of("items", items);
+            Map<String, Object> data = new HashMap<>();
+            String contextPath = request.getContextPath();
+            data.put("contextPath", contextPath);
+            data.put("items", items);
+            for (InventoryItem ii : items) {
+                System.out.println(ii.getId());
+            }
+
             response.setContentType("text/html;charset=UTF-8");
 
             Configuration cfg = new Configuration(Configuration.VERSION_2_3_31);
-            cfg.setDirectoryForTemplateLoading(new File(getServletContext().getRealPath("/resources/template")));
+            cfg.setDirectoryForTemplateLoading(new File(getServletContext().getRealPath("/WEB-INF/classes/template")));
             Template template = cfg.getTemplate("index.ftl");
             Writer out = response.getWriter();
             template.process(data, out);

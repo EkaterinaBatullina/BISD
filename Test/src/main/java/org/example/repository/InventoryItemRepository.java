@@ -20,6 +20,7 @@ public class InventoryItemRepository {
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
                     InventoryItem item = new InventoryItem();
+                    item.setId(rs.getInt("id"));
                     item.setName(rs.getString("item_name"));
                     item.setParameters(rs.getString("parameters"));
                     item.setAge(rs.getInt("age"));
