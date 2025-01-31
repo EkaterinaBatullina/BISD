@@ -24,6 +24,9 @@ public class LoginFrame {
         panel.setBackground(new Color(245, 245, 245)); // Легкий серый фон панели
 
         // Заголовок для экрана входа
+//        JPanel titlePanel = new JPanel(new FlowLayout(FlowLayout.CENTER));
+//        titlePanel.setBackground(new Color(245, 245, 245)); // Сделайте фон таким же
+//        JLabel titleLabel = new JLabel("Login");
         JLabel titleLabel = new JLabel("Login", JLabel.CENTER);
         titleLabel.setFont(new Font("Arial", Font.BOLD, 24));  // Крупный шрифт для заголовка
         titleLabel.setForeground(Color.BLACK);
@@ -31,7 +34,7 @@ public class LoginFrame {
         panel.add(new JLabel("")); // Пустой элемент для отступа
 
         // Поле для ввода имени пользователя
-        JLabel usernameLabel = new JLabel("Username:");
+        JLabel usernameLabel = new JLabel("Username:", JLabel.CENTER);
         usernameLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         panel.add(usernameLabel);
 
@@ -42,7 +45,7 @@ public class LoginFrame {
         panel.add(usernameField);
 
         // Поле для ввода пароля
-        JLabel passwordLabel = new JLabel("Password:");
+        JLabel passwordLabel = new JLabel("Password:", JLabel.CENTER);
         passwordLabel.setFont(new Font("Arial", Font.PLAIN, 16));
         panel.add(passwordLabel);
 

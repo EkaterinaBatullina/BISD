@@ -31,7 +31,7 @@ public class PreGameFrame {
         panel.setBackground(new Color(245, 245, 245)); // Легкий серый фон панели
 
         // Заголовок с приветствием
-        JLabel welcomeLabel = new JLabel("Welcome, " + username, JLabel.CENTER);
+        JLabel welcomeLabel = new JLabel("Welcome, " + username + "!", JLabel.CENTER);
         welcomeLabel.setFont(new Font("Arial", Font.BOLD, 24));  // Увеличен размер шрифта
         welcomeLabel.setForeground(Color.BLACK);
         panel.add(welcomeLabel);

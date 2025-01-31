@@ -21,10 +21,11 @@ public class Client {
     private ServerPlayer serverPlayer;
     private int playerId;
     private String username;
+    private Client thisComponent;
 
     public Client(String username) {
         this.username = username;
-
+        this.thisComponent = this;
         try {
             socket = new Socket(SERVER_ADDRESS, SERVER_PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -88,7 +89,7 @@ public class Client {
                     maze.getPoint().setPoints(newPoint);
                     // Если панель еще не создана, создаем её и добавляем в окно
                     if (mazePanel == null) {
-                        mazePanel = new MazePanel(clientPlayer, serverPlayer, maze);
+                        mazePanel = new MazePanel(clientPlayer, serverPlayer, maze, frame);
                         frame.getContentPane().removeAll();  // Удаляем старую панель, если она была
                         frame.add(mazePanel);  // Добавляем новую панель с лабиринтом
                         frame.pack();
@@ -127,13 +128,15 @@ public class Client {
                     if (mazePanel != null) {
                         mazePanel.updatePlayerState(playerX, playerY, score, slowed, slowdownTimer);
                     }
-                } else if (message.startsWith("SCORE")) {
-
-                    // Если панель уже существует, обновляем очки
-                    if (mazePanel != null) {
-                        mazePanel.updateScore();  // Обновляем отображение очков
-                    }
-                } else if (message.startsWith("TRAP")) {
+                }
+ //               else if (message.startsWith("SCORE")) {
+//
+//                    // Если панель уже существует, обновляем очки
+//                    if (mazePanel != null) {
+//                        mazePanel.updateScore();  // Обновляем отображение очков
+//                    }
+//                }
+            else if (message.startsWith("TRAP")) {
                     // Если панель уже существует, обновляем очки
                     if (clientPlayer != null) {
                         clientPlayer.setSlowed(true);  // Устанавливаем флаг замедления
@@ -159,20 +162,23 @@ public class Client {
                 } else if (message.startsWith("VICTORY")) {
                     // Обработка победы
                     String[] parts = message.split(" ");
-                    String winnerUsername = parts[1];
+                    String winnerUsername = parts[2];
 
                     // Выводим сообщение о победе на панели
                     if (mazePanel != null) {
                         mazePanel.displayVictoryMessage("Player " + winnerUsername + " wins!");
                     }
-                } else if (message.startsWith("GAME_READY")) {
+               // } else if (message.startsWith("GAME_READY")) {
+//                    out.println(message);
+//                    System.out.println("rrrrrrrrr");
+//                    SwingUtilities.invokeLater(() -> {
+//                        preGameFrame.handleGameReady(); // Предполагаем, что у тебя есть ссылка на объект PreGameFrame
+//                    });
+                } else if (message.startsWith("USER READY")) {
                     frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
                     frame.setVisible(true);
-                    System.out.println("rrrrrrrrr");
-                    // Уведомляем PreGameFrame, что игра готова
-                    SwingUtilities.invokeLater(() -> {
-                        preGameFrame.handleGameReady(); // Предполагаем, что у тебя есть ссылка на объект PreGameFrame
-                    });
+                    out.println(message);
+                    System.out.println("UUUSSSS");
                 }
             }
         } catch (IOException e) {
@@ -198,20 +204,20 @@ public class Client {
             else if (parts.length == 2 && parts[1].equals("FALSE")) {
                 // Обновляем состояние замедления без таймера
                 updateSlowdownStateFromServer(false, 0);
-            } else if (message.startsWith("WAITING_FOR_SECOND_PLAYER")) {
+           // } else if (message.startsWith("WAITING_FOR_SECOND_PLAYER")) {
                 // Игрок ожидает второго игрока
-                System.out.println("Waiting for second player...");
-            }  else if (message.startsWith("WAITING_FOR_SECOND_PLAYER")) {
+                //System.out.println("Waiting for second player...");
+            //}  else if (message.startsWith("WAITING_FOR_SECOND_PLAYER")) {
                 // Игрок ожидает второго игрока
-                System.out.println("Waiting for second player...");
+                //System.out.println("Waiting for second player...");
                 // Можно добавить уведомление в интерфейсе
-            } else if (message.startsWith("GAME_READY")) {
+          //  } else if (message.startsWith("GAME_READY")) {
                 // Игра готова к запуску
-                System.out.println("Second player is ready. Game will start soon.");
+                //System.out.println("Second player is ready. Game will start soon.");
                 // Можно обновить интерфейс, уведомив игрока
-            } else if (message.startsWith("START_GAME")) {
+          //  } else if (message.startsWith("START_GAME")) {
                 // Игра начинается
-                System.out.println("Game started!");
+                //System.out.println("Game started!");
                 // Логика старта игры
                 //startGame();
 
@@ -268,7 +274,6 @@ public class Client {
                 // Если был нажата клавиша, перемещаем игрока
                 if (dx != 0 || dy != 0) {
                     sendMoveCommandToServer(dx, dy);
-                    //clientPlayer.move(dx, dy);
                 }
             }
         });
@@ -307,8 +312,4 @@ public class Client {
             e.printStackTrace();
         }
     }
-
-//    public static void main(String[] args) {
-//        new Client(username);
-//    }
 }

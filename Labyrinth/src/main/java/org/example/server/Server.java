@@ -14,6 +14,8 @@ public class Server {
     private static boolean isGameReady = false;
     private static String firstPlayerUsername = null;
     private static String secondPlayerUsername = null;
+    private static boolean firstPlayerReady = false;
+    private static boolean secondPlayerReady = false;
 
     public static void main(String[] args) {
 
@@ -65,6 +67,18 @@ public class Server {
         }
     }
 
+    private static void sendMazeStateToClients() {
+        if (firstPlayerReady && secondPlayerReady) {
+            synchronized (clients) {
+                for (ClientHandler client : clients) {
+                    // client.player.setWaiting(false);
+                    client.sendMazeState();
+                    client.sendPlayerState();
+                }
+            }
+        }
+    }
+
     // Класс для обработки запросов от клиента
     static class ClientHandler extends Thread {
         private final Socket clientSocket;
@@ -97,23 +111,13 @@ public class Server {
                 // Инициализация нового игрока
                 player = new ServerPlayer(clientSocket, playerId, username);  // Создаем игрока
                 synchronized (clients) {
-                    // Отправляем состояние лабиринта новому клиенту
-
-
-                    //АААААААААААА
-                    //АААААААААААА
-                    //sendMazeState(); ВНИМАНИЕ ТУТ ЗАКОММЕНТИЛА
-                    //АААААААААААА
-                    //АААААААААААА
-
-
-                    // Отправляем состояние нового игрока только этому клиенту
                     sendPlayerState();
                 }
 
                 // Главный игровой цикл
                 String message;
                 while (isRunning && (message = in.readLine()) != null) {
+                    System.out.println(message);
                     System.out.println("reeeeaaaaaddddyyyy");
                     if (message.startsWith("USER READY")) {
                         String[] parts = message.split(" ");
@@ -121,7 +125,11 @@ public class Server {
                         this.difficulty = playerDifficulty;
                         System.out.println("reeeeaaaaaddddyyyy");// Сохраняем сложность
                         handlePlayerReady(username, difficulty);
-                    } else {
+                    }
+                    //else if (message.startsWith("GAME_READY")) {
+                    //player.setWaiting(false);
+                    //}
+                    else {
                         // Обрабатываем другие команды (например, движение)
                         handlePlayerInput(message);
                     }
@@ -140,27 +148,57 @@ public class Server {
         }
 
         private synchronized void handlePlayerReady(String username, String difficulty) {
+//            System.out.println("handlePlayerReady");
+//            System.out.println(firstPlayerUsername);
+//            System.out.println(secondPlayerUsername);
+//
+//            if (firstPlayerUsername == null) {
+//                firstPlayerUsername = username;
+//                System.out.println("WAITING_FOR_SECOND_PLAYER");// Первый игрок готов
+//                sendMessage("WAITING_FOR_SECOND_PLAYER");
+//                maze = createMazeBasedOnDifficulty(difficulty);
+//                maze.generate();  // Генерация лабиринта
+//                maze.getTrap().place();
+//                maze.getPoint().place();
+//                sendMazeState();// Ожидаем второго игрока
+//            } else if (secondPlayerUsername == null) {
+//                secondPlayerUsername = username;
+//                System.out.println("GAME_READY"); // Второй игрок готов
+//                sendMessage("GAME_READY");  // Игра готова к началу
+//                // Оповещаем первого игрока о готовности второго
+//                getClientByUsername(firstPlayerUsername).sendMessage("GAME_READY");
+//                sendMazeState();
+//                // Запускаем игру, когда оба игрока готовы
+//                startGameForBothPlayers();
+//            }
             System.out.println("handlePlayerReady");
-            System.out.println(firstPlayerUsername);
-            System.out.println(secondPlayerUsername);
+            System.out.println("First Player: " + firstPlayerUsername);
+            System.out.println("Second Player: " + secondPlayerUsername);
 
+            // Первый игрок
             if (firstPlayerUsername == null) {
                 firstPlayerUsername = username;
-                System.out.println("WAITING_FOR_SECOND_PLAYER");// Первый игрок готов
-                sendMessage("WAITING_FOR_SECOND_PLAYER");  // Ожидаем второго игрока
-            } else if (secondPlayerUsername == null) {
+                firstPlayerReady = true; // Первый игрок готов
+                System.out.println("WAITING_FOR_SECOND_PLAYER");
+                sendMessage("WAITING_FOR_SECOND_PLAYER");
+            }
+            // Второй игрок
+            else if (secondPlayerUsername == null) {
                 secondPlayerUsername = username;
-                System.out.println("GAME_READY"); // Второй игрок готов
-                sendMessage("GAME_READY");  // Игра готова к началу
-                // Оповещаем первого игрока о готовности второго
-                getClientByUsername(firstPlayerUsername).sendMessage("GAME_READY");
-                maze = createMazeBasedOnDifficulty(difficulty);
+                secondPlayerReady = true; // Второй игрок готов
+                System.out.println("SECOND_PLAYER_READY");
+                sendMessage("SECOND_PLAYER_READY");
+            }
+
+            // Проверяем, что оба игрока готовы
+            if (firstPlayerReady && secondPlayerReady) {
+                // Генерируем лабиринт после того как оба игрока готовы
+                maze = createMazeBasedOnDifficulty(difficulty); // Можно использовать сложность одного из игроков
                 maze.generate();  // Генерация лабиринта
                 maze.getTrap().place();
                 maze.getPoint().place();
-                sendMazeState();
-                // Запускаем игру, когда оба игрока готовы
-                startGameForBothPlayers();
+                Server.sendMazeStateToClients();  // Отправляем лабиринт обоим игрокам
+                startGameForBothPlayers(); // Запускаем игру
             }
         }
 
@@ -245,6 +283,7 @@ public class Server {
         }
 
         private void handlePlayerInput(String message) {
+            System.out.println(message);
             // Разбор команды
             String[] parts = message.split(" ");
             if (parts[0].equals("MOVE")) {
